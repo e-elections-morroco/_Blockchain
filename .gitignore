@@ -4,6 +4,7 @@ node_modules
 
 test_web
 /test_web
+./test_web
 
 
 /mycontent
