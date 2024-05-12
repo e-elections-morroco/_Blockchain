@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+</head>
+<body>
+    <button id="connectButton">Connecter Metamask</button>
+    <p id="accountArea"></p>
+    <button id="connectContractButton">Connecter le Contrat</button>
+    <p id="contractArea"></p>
+    <input type="text" id="cinInput" placeholder="Entrez le CIN">
+    <input type="text" id="dobInput" placeholder="Entrez la date de naissance (YYYY-MM-DD)">
+    <button id="validateButton">Valider</button>
+    <br>
+    <input type="text" id="uidInput1" placeholder="Entrez le premier UID">
+<input type="text" id="uidInput2" placeholder="Entrez le deuxième UID">
+<button id="voteButton">Voter</button>
+
+    <br>
+    <input type="text" id="getVoteCountInput" placeholder="Entrez l'UID">
+    <button id="getVoteCountButton">Obtenir le nombre de votes</button>
+
+    <script>
+        window.addEventListener('load', async function () {
+            const connectButton = document.getElementById("connectButton");
+            const connectContractButton = document.getElementById("connectContractButton");
+            const validateButton = document.getElementById("validateButton");
+            const voteButton = document.getElementById("voteButton");
+            const getVoteCountButton = document.getElementById("getVoteCountButton");
+            const accountArea = document.getElementById("accountArea");
+            const contractArea = document.getElementById("contractArea");
+            const cinInput = document.getElementById("cinInput");
+            const dobInput = document.getElementById("dobInput");
+            const uidInput = document.getElementById("uidInput");
+            const getVoteCountInput = document.getElementById("getVoteCountInput");
+            const uidInput1 = document.getElementById("uidInput1");
+            const uidInput2 = document.getElementById("uidInput2");
+
+            const contractAddress1 = "0xfa0d7dA8D1024D4b411C0f55B635c171F7ab9DD5"; // Remplacez ceci par l'adresse du contrat User
+            const contractABI1 = [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_userAddress",
+          "type": "address"
+        }
+      ],
+      "name": "getUserByAddress",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "bool",
+          "name": "isVoted",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_cin",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_dateOfBirth",
+          "type": "string"
+        }
+      ],
+      "name": "getUserByCinAndDateOfBirth",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "bool",
+          "name": "isVoted",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_userAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "_firstName",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_lastName",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_birthDate",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_cin",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_email",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_ville",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_phone",
+          "type": "string"
+        }
+      ],
+      "name": "setUser",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "userAddresses",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "users",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "firstName",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "lastName",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "birthDate",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "CIN",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "email",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "ville",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "phone",
+          "type": "string"
+        },
+        {
+          "internalType": "bool",
+          "name": "isVoted",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_userAddress",
+          "type": "address"
+        }
+      ],
+      "name": "vote",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ];
+
+            const contractAddress2 = "0x8b092776f642BaFfC47Dcc6452CF4AF63548EF96"; // Remplacez ceci par l'adresse du contrat Electeur
+            const contractABI2 = [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "electeurKeys",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "electeurs",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "UID",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "voteCount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAllElecteurs",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "UID",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "voteCount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Electeur.ElecteurInfo[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_UID",
+          "type": "uint256"
+        }
+      ],
+      "name": "getElecteur",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_UID",
+          "type": "uint256"
+        }
+      ],
+      "name": "setElecteur",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_UID1",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_UID2",
+          "type": "uint256"
+        }
+      ],
+      "name": "vote",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ];
+
+            let account;
+            let contract1;
+            let contract2;
+
+            const connectMetamask = async () => {
+                try {
+                    if (window.ethereum !== "undefined") {
+                        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                        account = accounts[0];
+                        accountArea.textContent = account;
+                    } else {
+                        accountArea.textContent = "Veuillez installer Metamask ou utiliser un navigateur Web3";
+                    }
+                } catch (error) {
+                    console.error(error);
+                    accountArea.textContent = "Une erreur s'est produite lors de la connexion à Metamask";
+                }
+            }
+
+            const connectContract = async () => {
+                try {
+                    if (account) {
+                        window.web3 = await new Web3(window.ethereum);
+                        contract1 = new window.web3.eth.Contract(contractABI1, contractAddress1);
+                        contract2 = new window.web3.eth.Contract(contractABI2, contractAddress2);
+                        contractArea.textContent = "Connecté aux contrats";
+                    } else {
+                        contractArea.textContent = "Veuillez d'abord connecter votre compte Metamask";
+                    }
+                } catch (error) {
+                    console.error(error);
+                    contractArea.textContent = "Une erreur s'est produite lors de la connexion aux contrats";
+                }
+            }
+
+            const validateUser = async () => {
+                try {
+                    if (account && contract1) {
+                        const userAddress = account;
+                        const cin = cinInput.value;
+                        const dob = dobInput.value;
+                        const result = await contract1.methods.getUserByCinAndDateOfBirth(cin, dob).call();
+                        const isVoted = result[7]; // Obtenez la valeur de isVoted
+                        if (!isVoted) {
+                            await contract1.methods.vote(userAddress).send({ from: account }); // Mettre à jour isVoted
+                            alert("Utilisateur validé avec succès et marqué comme ayant voté!");
+                        } else {
+                            alert("Cet utilisateur a déjà voté!");
+                        }
+                    } else {
+                        alert("Veuillez d'abord connecter votre compte Metamask et connecter le contrat");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("Une erreur s'est produite lors de la validation de l'utilisateur");
+                }
+            }
+
+            const voteForElecteur = async () => {
+    try {
+        if (account && contract2) {
+            const uid1 = uidInput1.value;
+            const uid2 = uidInput2.value;
+            await contract2.methods.vote(uid1, uid2).send({ from: account });
+            alert("Vote effectué avec succès!");
+        } else {
+            alert("Veuillez d'abord connecter votre compte Metamask et connecter le contrat");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Une erreur s'est produite lors du vote");
+    }
+}
+
+            const getVoteCount = async () => {
+                try {
+                    if (account && contract2) {
+                        const uid = getVoteCountInput.value;
+                        const result = await contract2.methods.getElecteur(uid).call();
+                        alert("Le nombre de votes pour l'UID " + uid + " est de " + result[1]);
+                    } else {
+                        alert("Veuillez d'abord connecter votre compte Metamask et connecter le contrat");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("Une erreur s'est produite lors de la récupération du nombre de votes");
+                }
+            }
+
+            connectButton.addEventListener('click', connectMetamask);
+            connectContractButton.addEventListener('click', connectContract);
+            validateButton.addEventListener('click', validateUser);
+            voteButton.addEventListener('click', voteForElecteur);
+            getVoteCountButton.addEventListener('click', getVoteCount);
+        });
+    </script>
+</body>
+</html>

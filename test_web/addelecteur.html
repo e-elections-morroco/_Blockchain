@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajout d'un Électeur</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+</head>
+<body>
+    <h1>Ajout d'un Électeur</h1>
+    <input type="text" id="uidInput" placeholder="Entrez l'UID">
+    <button id="addElecteurButton">Ajouter l'Électeur</button>
+
+    <script>
+        window.addEventListener('load', async function () {
+            const addElecteurButton = document.getElementById("addElecteurButton");
+            const uidInput = document.getElementById("uidInput");
+
+            const contractAddress = "0x8b092776f642BaFfC47Dcc6452CF4AF63548EF96"; // Adresse du contrat Electeur
+            const contractABI = [
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "_UID",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "setElecteur",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }
+            ];
+
+            let account;
+            let contract;
+
+            const connectMetamask = async () => {
+                try {
+                    if (window.ethereum !== "undefined") {
+                        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                        account = accounts[0];
+                    } else {
+                        alert("Veuillez installer Metamask ou utiliser un navigateur Web3");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("Une erreur s'est produite lors de la connexion à Metamask");
+                }
+            }
+
+            const connectContract = async () => {
+                try {
+                    if (account) {
+                        window.web3 = await new Web3(window.ethereum);
+                        contract = new window.web3.eth.Contract(contractABI, contractAddress);
+                    } else {
+                        alert("Veuillez d'abord connecter votre compte Metamask");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("Une erreur s'est produite lors de la connexion au contrat");
+                }
+            }
+
+            const addElecteur = async () => {
+                try {
+                    if (account && contract) {
+                        const uid = uidInput.value;
+                        await contract.methods.setElecteur(uid).send({ from: account });
+                        alert("Électeur ajouté avec succès!");
+                    } else {
+                        alert("Veuillez d'abord connecter votre compte Metamask et connecter le contrat");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("Une erreur s'est produite lors de l'ajout de l'électeur");
+                }
+            }
+
+            addElecteurButton.addEventListener('click', addElecteur);
+
+            await connectMetamask();
+            await connectContract();
+        });
+    </script>
+</body>
+</html>

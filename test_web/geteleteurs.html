@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test des Fonctions du Contrat Electeur</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+</head>
+<body>
+    <h1>Test des Fonctions du Contrat Electeur</h1>
+    <input type="text" id="uidInput" placeholder="Entrez l'UID">
+    <button id="getElecteurButton">Obtenir l'Électeur</button>
+    <br>
+    <button id="getAllElecteursButton">Obtenir Tous les Électeurs</button>
+    <div id="output"></div>
+
+    <script>
+        window.addEventListener('load', async function () {
+            const getElecteurButton = document.getElementById("getElecteurButton");
+            const getAllElecteursButton = document.getElementById("getAllElecteursButton");
+            const uidInput = document.getElementById("uidInput");
+            const output = document.getElementById("output");
+
+            const contractAddress = "0x8b092776f642BaFfC47Dcc6452CF4AF63548EF96"; // Adresse du contrat Electeur
+            const contractABI = [
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "_UID",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getElecteur",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "getAllElecteurs",
+                    "outputs": [
+                        {
+                            "components": [
+                                {
+                                    "internalType": "uint256",
+                                    "name": "UID",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "voteCount",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "internalType": "struct Electeur.ElecteurInfo[]",
+                            "name": "",
+                            "type": "tuple[]"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                }
+            ];
+
+            let account;
+            let contract;
+
+            const connectMetamask = async () => {
+                try {
+                    if (window.ethereum !== "undefined") {
+                        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                        account = accounts[0];
+                    } else {
+                        alert("Veuillez installer Metamask ou utiliser un navigateur Web3");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("Une erreur s'est produite lors de la connexion à Metamask");
+                }
+            }
+
+            const connectContract = async () => {
+                try {
+                    if (account) {
+                        window.web3 = await new Web3(window.ethereum);
+                        contract = new window.web3.eth.Contract(contractABI, contractAddress);
+                    } else {
+                        alert("Veuillez d'abord connecter votre compte Metamask");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("Une erreur s'est produite lors de la connexion au contrat");
+                }
+            }
+
+            const getElecteur = async () => {
+                try {
+                    if (account && contract) {
+                        const uid = uidInput.value;
+                        const result = await contract.methods.getElecteur(uid).call();
+                        output.innerHTML = `UID: ${result[0]}, Nombre de Votes: ${result[1]}`;
+                    } else {
+                        alert("Veuillez d'abord connecter votre compte Metamask et connecter le contrat");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("Une erreur s'est produite lors de la récupération de l'électeur");
+                }
+            }
+
+            const getAllElecteurs = async () => {
+                try {
+                    if (account && contract) {
+                        const result = await contract.methods.getAllElecteurs().call();
+                        output.innerHTML = "";
+                        result.forEach(electeur => {
+                            output.innerHTML += `UID: ${electeur.UID}, Nombre de Votes: ${electeur.voteCount}<br>`;
+                        });
+                    } else {
+                        alert("Veuillez d'abord connecter votre compte Metamask et connecter le contrat");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("Une erreur s'est produite lors de la récupération de tous les électeurs");
+                }
+            }
+
+            getElecteurButton.addEventListener('click', getElecteur);
+            getAllElecteursButton.addEventListener('click', getAllElecteurs);
+
+            await connectMetamask();
+            await connectContract();
+        });
+    </script>
+</body>
+</html>
