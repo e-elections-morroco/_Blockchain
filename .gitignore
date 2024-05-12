@@ -1,7 +1,7 @@
 node_modules
 .env
-# test_web
-# /test_web
+test_web
+/test_web
 /mycontent
 mycontent
 # Hardhat files
