@@ -31,9 +31,8 @@ contract Electeur {
         return allElecteurs;
     }
 
-    function vote(uint256 _UID1, uint256 _UID2) public {
-    electeurs[_UID1].voteCount++;
-    electeurs[_UID2].voteCount++;
+    function vote(uint256 _UID) public {
+    electeurs[_UID].voteCount++;
 }
 
 }
