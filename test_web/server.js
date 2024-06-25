@@ -19,6 +19,6 @@ app.get("/addelecteur",(req , res) =>{
 app.get("/getelecteurs",(req , res) =>{
     res.sendFile(path.join(__dirname+'/geteleteurs.html'));
 })
-const server = app.listen(5000);
+const server = app.listen(5001);
 const portNumber = server.address().port;
 console.log("port: " ,portNumber);
